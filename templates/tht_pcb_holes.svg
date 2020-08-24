@@ -1,0 +1,11 @@
+{% extends 'tht_copper_pcb.svg' %}
+{% block connector_circles %}
+      <g
+        id="tht_circles"
+        fill="none"
+      >
+  {% for connector in connectors %}
+    {% include 'pcb_pin_hole.svg' %}
+  {% endfor %}
+      </g>
+{% endblock %}

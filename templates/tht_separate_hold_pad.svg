@@ -1,0 +1,5 @@
+{% extends 'tht_pcb_pads.svg' %}
+{% block silkscreen %}
+  <g id="silkscreen">
+  </g>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'tht_pcb_holes.svg' %}
+{% block extended_pads %}
+      <g
+        id="extended_pads"
+        stroke="none"
+        transform="translate(-{{ pad.half_width }},-{{ clean_number((pad.full_length - pad.full_width) / 2) }})"
+      >
+  {% for connector in connectors %}
+    {% include 'pcb_expanded_pad.svg' %}
+  {% endfor %}
+      </g>
+{% endblock %}

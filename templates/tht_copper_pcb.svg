@@ -1,0 +1,7 @@
+{% extends 'all_copper_pcb.svg' %}
+{% block copper_content %}
+    <g id='copper0'>
+      {% block connector_circles %}{% endblock %}
+      {% block extended_pads %}{% endblock %}
+    </g>
+{% endblock %}
