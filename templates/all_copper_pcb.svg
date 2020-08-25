@@ -1,12 +1,14 @@
 {% extends 'base_pcb.svg' %}
+{% macro all_copper() %}
+<g
+  id='copper1'
+  fill="#f7bd13"
+  stroke="#f7bd13"
+  stroke-width="{{ clean_number((pad.full_width - pad.hole_width) / 2) }}"
+  transform="translate({{ pad.half_width }},{{ clean_number(pad.full_length / 2) }})"
+>
+  {% block copper_content %}{% endblock %}
+</g>{% endmacro %}
 {% block copper %}
-  <g
-    id='copper1'
-    fill="#f7bd13"
-    stroke="#f7bd13"
-    stroke-width="{{ clean_number((pad.full_width - pad.hole_width) / 2) }}"
-    transform="translate({{ pad.half_width }},{{ clean_number(pad.full_length / 2) }})"
-  >
-    {% block copper_content %}{% endblock %}
-  </g>
+  {{ all_copper()|indent(2)}}
 {% endblock %}

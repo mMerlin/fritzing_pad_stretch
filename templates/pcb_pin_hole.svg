@@ -1,1 +1,1 @@
-        <circle id="{{ pad.connector_prefix }}{{ pad.starting_connector + connector }}{{ pad.connector_suffix }}" r="{{ pad.circle_radius }}" cx="{{ clean_number(connector * pad.pin_spacing) }}" cy="0"/>
+  <circle id="{{ pad.connector_prefix }}{{ pad.starting_connector + connector }}{{ pad.connector_suffix }}" r="{{ pad.circle_radius }}" cx="{{ clean_number(connector * pad.pin_spacing) }}" cy="0"/>

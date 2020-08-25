@@ -1,7 +1,9 @@
 {% extends 'all_copper_pcb.svg' %}
+{% macro tht_copper() %}
+<g id='copper0'>
+  {% block connector_circles %}{% endblock %}
+  {% block extended_pads %}{% endblock %}
+</g>{% endmacro %}
 {% block copper_content %}
-    <g id='copper0'>
-      {% block connector_circles %}{% endblock %}
-      {% block extended_pads %}{% endblock %}
-    </g>
+  {{ tht_copper()|indent(2)}}
 {% endblock %}

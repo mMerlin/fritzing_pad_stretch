@@ -1,11 +1,13 @@
 {% extends 'tht_copper_pcb.svg' %}
+{% macro circles() %}
+<g
+  id="tht_circles"
+  fill="none"
+>
+{% for connector in connectors %}
+  {% include 'pcb_pin_hole.svg' %}
+{% endfor %}
+</g>{% endmacro %}
 {% block connector_circles %}
-      <g
-        id="tht_circles"
-        fill="none"
-      >
-  {% for connector in connectors %}
-    {% include 'pcb_pin_hole.svg' %}
-  {% endfor %}
-      </g>
+  {{ circles()|indent(2)}}
 {% endblock %}

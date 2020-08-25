@@ -27,7 +27,7 @@ def validate_parameter_relations(parameters: argparse.Namespace) -> dict:
     to be run after all of a set of arguments have been proccessed (or
     defaulted)
     '''
-    #pylint: disable=too-many-branches
+    #pylint: disable=too-many-branches,too-many-statements
     error_count = 0
     exception_messages = []
 
@@ -212,7 +212,7 @@ class MakeStretched:
         pad_data = self.build_pad_data()
         # Hole center is the origin (0,0) point for the pad
         # template = env.get_template('wrapped_pad_holes.svg')
-        template = self.jinja_env.get_template('tht_separate_hold_pad.svg')
+        template = self.jinja_env.get_template('tht_separate_hole_pad.svg')
         output = template.render(
             pad=pad_data,
             drawing=drawing_data,
