@@ -13,7 +13,6 @@ import argparse
 
 # related third party imports
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
-# Template #, escape
 
 STRETCHED_PADS_VERSION = '0.0.1'
 
@@ -104,13 +103,6 @@ def validate_parameter_relations(parameters: argparse.Namespace) -> dict:
         raise NotImplementedError(
             'current version of the code does not support creating only circular pads')
 
-
-    # parameters.hole_diameter
-    # parameters.pad_width
-    # parameters.pad_length
-    # parameters.hole_position
-    # parameters.hole_padding
-
     return {
         'errors': error_count,
         'messages': exception_messages
@@ -129,11 +121,10 @@ class MakeStretched:
     '''Create Fritzing SVG PCB view stretched pads from parameter constraints'''
     TEMPLATE_PATH = 'templates'
     DBG_SCALE_100_TIMES = 0x1
+    DBG_SHOW_PARAMS = 0x2
 
     def __init__(self, cmd_args: argparse.Namespace):
         '''gather constraint parameters from command line arguments'''
-        # http://zetcode.com/python/jinja/
-        # see 'import Environment'
         self.command_arguments = cmd_args
         result = validate_parameter_relations(cmd_args)
         if result['errors'] > 0:
@@ -160,6 +151,8 @@ class MakeStretched:
     def print_base_arguments(self) -> None: # DEBUG
         '''debug method to dump the main run time parameters'''
         parm = self.command_arguments
+        if not parm.debug & self.DBG_SHOW_PARAMS:
+            return
         print('hole diameter: {0}'.format(parm.hole_diameter))
         print('pad width: {0}'.format(parm.pad_width))
         print('pad length: {0}'.format(parm.pad_length))
@@ -204,32 +197,15 @@ class MakeStretched:
 
     def generate_svg_pads(self) -> None:
         '''create and output a complete svg file based on the instance parameters'''
-        # control whitespace summary : https://stackoverflow.com/a/35777386
-        # control whitespace docs:
-        #   https://jinja.palletsprojects.com/en/master/templates/#whitespace-control
         self.print_base_arguments() # DEBUG
         drawing_data = self.build_drawing_data()
         pad_data = self.build_pad_data()
-        # Hole center is the origin (0,0) point for the pad
-        # template = env.get_template('wrapped_pad_holes.svg')
         template = self.jinja_env.get_template('tht_separate_hole_pad.svg')
         output = template.render(
             pad=pad_data,
             drawing=drawing_data,
             connectors=range(self.command_arguments.row_pins))
         self.command_arguments.svg_file.write(output)
-        # create macro, use indent https://stackoverflow.com/a/10997352
-        # do not indent first https://stackoverflow.com/a/31856334
-        # use `set` (and namespace) to carry indent increments through nesting
-        # https://jinja.palletsprojects.com/en/2.11.x/templates/#assignments
-        # from above, maybe block assignment instead of macro
-        # report statistics about the generated hole set:
-        #  trace width that will fit between pads at specified keepout
-        #    assuming more than one pin
-        #  trace width that will fit 2 traces between pads at specified keepout
-        #  number of `zero` width «keepout width» traces that will fit between pads
-        #    int(separation / keepout) - 1
-        #    (int(separation / keepout) - 1) % 2 - 1 ??
     # end def generate_svg_pads:
 # end class MakeStretched
 
