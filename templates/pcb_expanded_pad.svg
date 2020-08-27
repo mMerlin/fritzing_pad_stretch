@@ -2,8 +2,8 @@
     d="m{{ connector * pad.pin_spacing }},0
       a {{ pad.half_width }},{{ pad.half_width }} 0 0 1 {{ pad.full_width }},0v{{ pad.full_length - pad.full_width }}
       a {{ pad.half_width }},{{ pad.half_width }} 0 0 1-{{ pad.full_width }},0z
-      m {{ clean_number(((pad.full_width - pad.hole_width) / 2) - 1) }},{{ clean_number(((pad.full_length - pad.full_width) / 2) + pad.inner_padding) }}
-      a {{ pad.hole_radius + pad.inner_padding }},{{ pad.hole_radius + pad.inner_padding }} 0 0 0 {{ 2 * (pad.hole_radius + pad.inner_padding) }},0v-{{ 2 * pad.inner_padding }}
-      a {{ pad.hole_radius + pad.inner_padding }},{{ pad.hole_radius + pad.inner_padding }} 0 0 0-{{ 2 * (pad.hole_radius + pad.inner_padding) }},0
+      m {{ clean_number((pad.full_width - pad.hole_width) / 2) }},{{ pad.centre_offset }}
+      a {{ pad.hole_radius }},{{ pad.hole_radius }} 0 0 0 {{ pad.hole_width }},0
+      a {{ pad.hole_radius }},{{ pad.hole_radius }} 0 0 0-{{ pad.hole_width }},0
       z"
   />

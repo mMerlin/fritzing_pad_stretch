@@ -42,13 +42,16 @@ Notes on formulas and relationships between parameters and numbers in the svg fi
 * The radius of the circle is either (equivalent)
   * The pad width minus the (stroke width / 2)
   * The hole diameter plus the (stroke width / 2)
-* the radius of the outer arc of the pad is (pad width / 2)
-* assuming pads sequencing from left to right
+* The radius of the outer arc of the pad is (pad width / 2)
+* Assuming adjacent pads are horizontally offset
   * starting from the center of the circle, the offset to the start of the outer arc (semi-circle) of the pad, is:
     * x = ± (pad width / 2)
     * for a pad centered around the circle
       * y = ± (pad length - pad width) / 2
-  * the offset to the end point of the other end of the outer circular are is:
+    * with the pad offset so that one end just wraps the circle
+      * y = 0 (the centre of the pad ending arc is the same as the center of the circle), or
+      * y = pad length - pad width
+  * the offset from there to the end point of the other end of the outer circular arc is:
     * x = ± pad width
     * y = 0
 
@@ -56,14 +59,12 @@ Notes on formulas and relationships between parameters and numbers in the svg fi
 
 * create as html, css, javascript, such that it can be hosted on github.io
 * «future» functions
-  * number of pins (in a single row)
   * pin spacing (in a single row)
   * number or rows
   * row spacing
   * merged or separate (groups) for circles and paths
-  * starting pin number
   * generate vertically instead of horizontally
-    * numbering sequence will have first pin will be top left, going down, then up the second side. Keeps the first pin at the origin, where as with the horizontal layout, the second row `pushes` to first row down.
+    * numbering sequence will have first pin at the top left, going down, then up the second side. Keeps the first pin at the origin, whereas with the horizontal layout, the second row `pushes` the first row down.
   * generated silkscreen border
     * rectangle
     * brackets

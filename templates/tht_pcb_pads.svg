@@ -3,7 +3,7 @@
 <g
   id="extended_pads"
   stroke="none"
-  transform="translate(-{{ pad.half_width }},-{{ clean_number((pad.full_length - pad.full_width) / 2) }})"
+  transform="translate(-{{ pad.half_width }},{{ clean_number(-pad.centre_offset) }})"
 >
 {% for connector in connectors %}
   {% include 'pcb_expanded_pad.svg' %}
