@@ -1,11 +1,11 @@
 --diameter
 40
---width
+--minimum
 60
---length
+--maximum
 90
 --position
-centre
+horizontal
 --padding
 0
 --first-connector
@@ -17,5 +17,5 @@ centre
 --keepout
 10
 --debug
-63
+8191
 test.svg
