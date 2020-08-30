@@ -12,6 +12,49 @@ This was (is being) developed using python 3.7.8 with the Jinja2 v2.11.2 templat
 * [Planning](#link_planning)
 * [References](#link_references)
 
+This is up to a useable state now. It can generate horizontal or vertical rows of connectors, using several different constraint parameters. The only thing from the options explicitly disabled, is generating circular pads. That is supposed to be possible by setting the pad minimum and maximum to the same value, but the code to filter out the no longer needed path element has not been written. So it is set to throw an error if that condition is seen. Here is the built in help, to get an idea of what can be controlled. Everything except the output svg file name is optional. There are defaults, though not necessarily `reasonable` for everything else. The generated svg includes silkscreen, copper1, copper0 layer ids. If you have a favorite set of default parameters, put them in a text file, then provided that to the application, followed by any overrides for the current run. The last copy of a parameters on the command line will be the one actually used.
+
+```txt
+./stretched_pads.py -h
+usage: stretched_pads.py [options] [@parameter_file] output_file
+
+Fritzing SVG Stretched PCB pad builder
+
+positional arguments:
+  output-svg-file       SVG file to create
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  -d d, --diameter d    connector hole diameter. Default: 38
+  -w w, --minimum w     narrowest dimension of a pad (must be > diameter).
+                        Default: 45
+  -l l, --maximum l     longest dimension of a pad (must be > width). Default:
+                        90
+  -P pos, --position pos
+                        position of the pad relative to the hole: top, bottom,
+                        left, right, horizontal, vertical. Default: horizontal
+  -p p, --padding p     for positions other than `horizontal` or `vertical`
+                        (centred), extra room to leave beyond that provided by
+                        the difference between diameter and width. Default: 0
+  -f n, --first-connector n
+                        The number (id) of the first (lowest) connector pad to
+                        generate. Default: 0
+  -r n, --row-pins n    The number of pins to included in a single row.
+                        Default: 1
+  -s d, --pad-spacing d
+                        The centre to centre distance between adjacent
+                        connector pads in a row. Default: 100
+  -k d, --keepout d     The minimum separation distance between traces to
+                        satisfy design rules. Default: 10
+  -D bits, --debug bits
+                        debug flags A single integer value that represents the
+                        binary `or` of the desired debug control flags bit 0
+                        100 times scaling
+
+All size values are in mils (1/1000th inch)
+```
+
 <!--
 * [Link](#link_link)
 ## <a name="link_link">⚓</a> Link
