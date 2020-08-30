@@ -1,9 +1,9 @@
   <path
-    d="m{{ connector * pad.pin_spacing }},0
-      a {{ pad.half_width }},{{ pad.half_width }} 0 0 1 {{ pad.full_width }},0v{{ pad.full_length - pad.full_width }}
-      a {{ pad.half_width }},{{ pad.half_width }} 0 0 1-{{ pad.full_width }},0z
-      m {{ clean_number((pad.full_width - pad.hole_width) / 2) }},{{ pad.centre_offset }}
-      a {{ pad.hole_radius }},{{ pad.hole_radius }} 0 0 0 {{ pad.hole_width }},0
-      a {{ pad.hole_radius }},{{ pad.hole_radius }} 0 0 0-{{ pad.hole_width }},0
+    d="m{{ connector * pad.base_x }},{{ connector * pad.base_y }}
+      a {{ pad.half_width }},{{ pad.half_width }} 0 0 {{ pad.outer_sweep }} {{ pad.outer0_dx }},{{ pad.outer0_dy }}{{ pad.line_direction }}{{ pad.full_length - pad.full_width }}
+      a {{ pad.half_width }},{{ pad.half_width }} 0 0 {{ pad.outer_sweep }} {{ pad.outer1_dx }},{{ pad.outer1_dy }}z
+      m {{ pad.move_dx }},{{ pad.move_dy }}
+      a {{ pad.hole_radius }},{{ pad.hole_radius }} 0 0 {{ pad.inner_sweep }} {{ pad.inner0_dx }},{{ pad.inner0_dy }}
+      a {{ pad.hole_radius }},{{ pad.hole_radius }} 0 0 {{ pad.inner_sweep }} {{ pad.inner1_dx }},{{ pad.inner1_dy }}
       z"
   />

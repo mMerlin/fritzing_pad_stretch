@@ -4,8 +4,8 @@
   id='copper1'
   fill="#f7bd13"
   stroke="#f7bd13"
-  stroke-width="{{ clean_number((pad.full_width - pad.hole_width) / 2) }}"
-  transform="translate({{ pad.half_width }},{{ clean_number((pad.full_width / 2) + pad.centre_offset) }})"
+  stroke-width="{{ drawing.copper_stroke }}"
+  transform="translate({{ drawing.copper1_translate_x }},{{ drawing.copper1_translate_y }})"
 >
   {% block copper_content %}{% endblock %}
 </g>{% endmacro %}

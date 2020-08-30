@@ -20,12 +20,12 @@ This was (is being) developed using python 3.7.8 with the Jinja2 v2.11.2 templat
 ## <a name="link_planning">⚓</a> Planning
 
 * command line parameters
-  * validation ¦ the numeric values of most parameters are interdependent
+  * validation ¦ the numeric value limits of most parameters are interdependent
     * argparse can not (seem to) do the interdependent checks, but the class that builds the parser can
 * simple code currently turns float to integer value when possible
   * extend to add rounding, whether (smart) cast to integer or not. Do not want decimal fraction values that end with …999 or …0000n
-* the hole center is the origin (0,0) point for the pad. That is the reference point for offset distances to the pad graphics, the next pad, the next row, and the edge of the image
-  * with the pad offset from hole, the gap between rows can vary independent of row spacing and pad maximum. The pads could be 'pointing out', or centered, for the same dimensions.
+* the (drilled) hole center is the origin (0,0) point for the pad. That is the reference point for offset distances to the pad graphics, the next pad, the next row, and the edge of the image
+  * with the pad offset from the hole, the gap between rows can vary independent of row spacing and pad maximum. The pads could be 'pointing out', or centered, for the same dimensions.
 * for pad dimensions, avoid using terms (and variables) like width and height. Those would overlap with the width and height attributes of svg elements, and the context reverses depending on whether working with a horizontal or vertical pin row.
 
 ## <a name="link_math">⚓</a> Math
@@ -51,16 +51,16 @@ For convenience, pads can be described as having short and long cross section di
   * u = ± pad minimum
   * v = 0
 
+Note: The resulting circle and pad will be technically correct as long as the inner cutout (double half circles) do not get outside the extents of the (inner or outer edge of the) stroke for the circle that defines the hole to be drilled. However, the current version of the Fritzing code checks the percentage overlap between the circle and other (non connector) copper graphics to determine when to include that graphics as part of the connector pad. If that overlap gets too small, the pad gets treated as a separate, disconnected net, causing problems with (at least) the design rules checking. The implementation used here sets maximal overlap, completely covering the stroke for the hole, by exactly following the inner boundary with the pad cutout. Similarly, the graphics pair is technically correct as long as the outer edge of the hole stroke is completely within the non-cutout portion of the pad graphic. Again, to maximize overlap, the circle radius and stroke width are manipulated to be as large as possible within those constraints, so that the outer edge of the circle stroke exactly reaches to, but does not cross, the outside boundary of the pad graphics.
+
 ## <a name="link_ideas">⚓</a> Ideas
 
 * create as html, css, javascript, such that it can be hosted on github.io, and images easily «displayed and» downloaded
 * «future» functions
-  * pin spacing (in a single row)
   * number or rows
   * row spacing
   * merged or separate (groups) for circles and paths
-  * generate vertically instead of horizontally
-    * numbering sequence will have first pin at the top left, going down, then up the second side. Keeps the first pin at the origin, whereas with the horizontal layout, the second row `pushes` the first row down.
+  * multiple row vertical numbering sequence will have first pin at the top left, going down, then up the second side. Keeps the first pin at the origin, whereas with the horizontal layout, the second row `pushes` the first row down.
   * generated silkscreen border
     * rectangle
     * brackets
@@ -92,9 +92,9 @@ For convenience, pads can be described as having short and long cross section di
 * allow abbreviation of pad position to (minimum of) first letter
   * needs a custom argparse action, and choices entry may not work
 * add verbose reporting (option) for pins, connector ids, dimensions of created image
-* connector id prefix text
-* connector id suffix «pin¦pad»
-* first connector id "connector«n»«pin¦pad»"
+* input connector id prefix text
+* input connector id suffix «pin¦pad»
+* input complete first connector id "connector«n»«pin¦pad»"
   * connector id template regex: «prefix»«first_connector»«suffix»
 * save as defaults (create file that can be used with `@` prefix)
 * ignore min and max limits
@@ -121,14 +121,20 @@ Minimal Unittest for parameter values
 ```sh
 ./_hpd_unittest 2> test.out
 diff test.out _hpd_ut_exceptions.out
-# line numbers likely to change
+# «only» line numbers likely to change, barring intended implementation changes
 
 ./stretched_pads.py @sample
 diff test.svg _hpd_h_c_40_60_90_0.svg
-./stretched_pads.py @sample -Ptop
+./stretched_pads.py @sample -P top
 diff test.svg _hpd_h_t_40_60_90_0.svg
-./stretched_pads.py @sample -Pbottom
+./stretched_pads.py @sample -P bottom
 diff test.svg _hpd_h_b_40_60_90_0.svg
+./stretched_pads.py @sample -P vertical
+diff test.svg _hpd_v_c_40_60_90_0.svg
+./stretched_pads.py @sample -P left
+diff test.svg _hpd_v_l_40_60_90_0.svg
+./stretched_pads.py @sample -P right
+diff test.svg _hpd_v_r_40_60_90_0.svg
 ```
 
 ## functional comment block

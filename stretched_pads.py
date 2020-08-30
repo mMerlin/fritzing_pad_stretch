@@ -41,6 +41,14 @@ def float2int(value: float) -> float:
     return value
 # end def float2int()
 
+def float2int_decorator(func: callable) -> callable:
+    '''create decorator that passes the result of calling a function through float2int'''
+    def inner(*args, **kwargs) -> float:
+        '''pass the function return value through float2int'''
+        return float2int(func(*args, **kwargs))
+    return inner
+# end def float2int_decorator()
+
 def represents_int(value: str) -> bool:
     '''detect when a string can be represented as an integer by python'''
     try:
@@ -74,7 +82,12 @@ def whole_number(value: str) -> int:
     return int_value
 # end def positive_numeric()
 
-class MakeStretched:
+class MakeStretchedBase:
+    '''dummy parent class, to have something to tie type hinting to'''
+    # pylint: disable=too-few-public-methods,unnecessary-pass
+    pass
+
+class MakeStretched(MakeStretchedBase):
     '''Create Fritzing SVG PCB view stretched pads from parameter constraints'''
     TEMPLATE_PATH = 'templates'
     DBG_SHOW_PARAMS = 0x1
@@ -91,8 +104,11 @@ class MakeStretched:
     def __init__(self, cmd_args: argparse.Namespace):
         '''gather constraint parameters from command line arguments'''
         self.command_arguments = cmd_args
-        self.horizontal_factor = None
-        self.vertical_factor = None
+        self.print_base_arguments()
+        self.configured = {}
+        self.configure_for_direction()
+        self.build_pad_data()
+        self.build_drawing_data()
         self.jinja_env = self.create_jinja_environment()
         self.generate_svg_pads()
     # end def __init__()
@@ -119,7 +135,9 @@ class MakeStretched:
         print('pad maximum: {0}'.format(parm.pad_max))
         print('pad position: {0}'.format(parm.pad_position))
         print('hole padding: {0}'.format(parm.hole_padding))
+        print('first connector: {0}'.format(parm.first_connector))
         print('pins in a row: {0}'.format(parm.row_pins))
+        print('pad spacing: {0}'.format(parm.pad_spacing))
         print('debug: {0}'.format(bin(parm.debug)))
     # end def print_base_arguments()
 
@@ -131,13 +149,27 @@ class MakeStretched:
         print('Starting connector id: "{0}{1}{2}"'.format(
             pad['connector_prefix'], pad['starting_connector'], pad['connector_suffix']))
         print('pin spacing: {0}'.format(pad['pin_spacing']))
-        print('hole width: {0}'.format(pad['hole_width']))
-        print('hole radius: {0}'.format(pad['hole_radius']))
-        print('full width {0}'.format(pad['full_width']))
-        print('half width {0}'.format(pad['half_width']))
-        print('full length {0}'.format(pad['full_length']))
+        print('drilled hole radius: {0}'.format(pad['hole_radius']))
+        print('pad short crosssection {0}'.format(pad['full_width']))
+        print('half short crosssection {0}'.format(pad['half_width']))
+        print('pad long crosssection {0}'.format(pad['full_length']))
         print('circle radius {0}'.format(pad['circle_radius']))
-        print('centre offset {0}'.format(pad['centre_offset']))
+        print('(u,v) dimensions ({0}, {1})'.format(
+            pad['u_dimension'], pad['v_dimension']))
+        print('base connector offset ({0}, {1})'.format(
+            pad['base_x'], pad['base_y']))
+        print('first outer arc offset ({0}, {1})'.format(
+            pad['outer0_dx'], pad['outer0_dy']))
+        print('second outer arc offset ({0}, {1})'.format(
+            pad['outer1_dx'], pad['outer1_dy']))
+        print('outer, inner sweep direction ({0}, {1})'.format(
+            pad['outer_sweep'], pad['inner_sweep']))
+        print('inner move offset ({0}, {1})'.format(
+            pad['move_dx'], pad['move_dy']))
+        print('first inner arc offset ({0}, {1})'.format(
+            pad['inner0_dx'], pad['inner0_dy']))
+        print('second inner arc offset ({0}, {1})'.format(
+            pad['inner1_dx'], pad['inner1_dy']))
     # end def print_pad_parameters()
 
     def print_drawing_parameters(self, draw: dict) -> None:
@@ -150,7 +182,28 @@ class MakeStretched:
         print('px width {0}'.format(draw['px_width']))
         print('unit height {0}'.format(draw['unit_height']))
         print('unit width {0}'.format(draw['unit_width']))
+        print('copper stroke width {0}'.format(draw['copper_stroke']))
+        print('copper translate ({0}, {1})'.format(
+            draw['copper1_translate_x'], draw['copper1_translate_y']))
+        print('pad translate ({0}, {1})'.format(
+            draw['pad_translate_x'], draw['pad_translate_y']))
     # end def print_drawing_parameters()
+
+    @float2int_decorator
+    def oriented_x_value(self, u_value: float, v_value: float) -> float:
+        '''use the u or v value for x based on the current orientation'''
+        if bool(self.configured['horizontal_factor']):
+            return u_value
+        return v_value
+    # end def oriented_x_value()
+
+    @float2int_decorator
+    def oriented_y_value(self, u_value: float, v_value: float) -> float:
+        '''use the u or v value for y based on the current orientation'''
+        if bool(self.configured['vertical_factor']):
+            return u_value
+        return v_value
+    # end def oriented_y_value()
 
     def configure_for_direction(self) -> None:
         '''configure constants that allow simple orientation independent calculations
@@ -164,35 +217,47 @@ class MakeStretched:
         '''
         if self.command_arguments.pad_position in (
                 PAD_POS_HORIZONTAL, PAD_POS_BOTTOM, PAD_POS_TOP):
-            self.horizontal_factor = 1
-            self.vertical_factor = 0
+            self.configured['horizontal_factor'] = 1
+            self.configured['vertical_factor'] = 0
+            self.configured['u_dimension'] = 'x'
+            self.configured['v_dimension'] = 'y'
         else:
-            self.horizontal_factor = 0
-            self.vertical_factor = 1
+            self.configured['horizontal_factor'] = 0
+            self.configured['vertical_factor'] = 1
+            self.configured['u_dimension'] = 'y'
+            self.configured['v_dimension'] = 'x'
     # end def configure_for_direction()
 
-    def build_drawing_data(self) -> dict:
+    def build_drawing_data(self) -> None:
         '''populate dictionary with drawing level data for the generated image file'''
         parm = self.command_arguments
+        pad_data = self.configured['pad']
         data = {
             'units': self.UNITS_INCHES
         }
-        if bool(self.horizontal_factor):
-            data['px_width'] = parm.pad_min + (parm.row_pins - 1) * parm.pad_spacing
-            data['px_height'] = parm.pad_max
-        else:
-            data['px_height'] = parm.pad_min + (parm.row_pins - 1) * parm.pad_spacing
-            data['px_width'] = parm.pad_max
+        data['copper_stroke'] = float2int((parm.pad_min - parm.hole_diameter) / 2)
+        u_v_pair = self.create_u_v(parm.pad_min + (parm.row_pins - 1) * parm.pad_spacing,
+                                   parm.pad_max)
+        data['px_width'] = u_v_pair.x
+        data['px_height'] = u_v_pair.y
         scale_factor = self.MIL_FACTOR
         if parm.debug & self.DBG_SCALE_100_TIMES:
             scale_factor = float2int(self.MIL_FACTOR / 100)
         data['unit_height'] = float2int(data['px_height'] / scale_factor)
         data['unit_width'] = float2int(data['px_width'] / scale_factor)
+        half_pad_minimum = pad_data['half_width']
+        u_v_pair = self.create_u_v(half_pad_minimum,
+                                   half_pad_minimum + self.configured['pad_offset'])
+        data['copper1_translate_x'] = u_v_pair.x
+        data['copper1_translate_y'] = u_v_pair.y
+        u_v_pair = self.create_u_v(-half_pad_minimum, -self.configured['pad_offset'])
+        data['pad_translate_x'] = u_v_pair.x
+        data['pad_translate_y'] = u_v_pair.y
         self.print_drawing_parameters(data)
-        return data
+        self.configured['drawing'] = data
     # end def build_drawing_data()
 
-    def build_pad_data(self) -> dict:
+    def build_pad_data(self) -> None:
         '''populate dictionary with pad level data for the generated image file'''
         parm = self.command_arguments
         data = {}
@@ -200,35 +265,84 @@ class MakeStretched:
         data['connector_suffix'] = self.CON_SUFFIX_DEFAULT
         data['starting_connector'] = parm.first_connector
         data['pin_spacing'] = parm.pad_spacing
-        data['hole_width'] = parm.hole_diameter
         data['hole_radius'] = float2int(parm.hole_diameter / 2)
         data['full_width'] = parm.pad_min
         data['half_width'] = float2int(parm.pad_min / 2)
         data['full_length'] = parm.pad_max
         data['circle_radius'] = float2int((parm.pad_min + parm.hole_diameter) / 4)
         if parm.pad_position in (PAD_POS_HORIZONTAL, PAD_POS_VERTICAL):
-            data['centre_offset'] = float2int((parm.pad_max - parm.pad_min) / 2)
+            pad_offset = float2int((parm.pad_max - parm.pad_min) / 2)
         elif parm.pad_position in (PAD_POS_BOTTOM, PAD_POS_RIGHT):
-            data['centre_offset'] = parm.hole_padding
+            pad_offset = parm.hole_padding
         else: # parm.pad_position in (PAD_POS_TOP, PAD_POS_LEFT):
-            data['centre_offset'] = parm.pad_max - parm.pad_min - parm.hole_padding
+            pad_offset = parm.pad_max - parm.pad_min - parm.hole_padding
+        self.configured['pad_offset'] = pad_offset
+        data['u_dimension'] = self.configured['u_dimension']
+        data['v_dimension'] = self.configured['v_dimension']
+        u_v_pair = self.create_u_v(parm.pad_spacing, 0)
+        data['base_x'] = u_v_pair.x
+        data['base_y'] = u_v_pair.y
+        u_v_pair = self.create_u_v(parm.pad_min, 0)
+        data['outer0_dx'] = u_v_pair.x
+        data['outer0_dy'] = u_v_pair.y
+        u_v_pair.u = -u_v_pair.u
+        data['outer1_dx'] = u_v_pair.x
+        data['outer1_dy'] = u_v_pair.y
+        u_v_pair = self.create_u_v(1, 0)
+        data['outer_sweep'] = u_v_pair.x
+        data['inner_sweep'] = u_v_pair.y
+        data['line_direction'] = ('h', 'v')[u_v_pair.x]
+        u_v_pair = self.create_u_v(
+            ((parm.pad_min - parm.hole_diameter) / 2),
+            self.configured['pad_offset'])
+        data['move_dx'] = u_v_pair.x
+        data['move_dy'] = u_v_pair.y
+        u_v_pair = self.create_u_v(parm.hole_diameter, 0)
+        data['inner0_dx'] = u_v_pair.x
+        data['inner0_dy'] = u_v_pair.y
+        u_v_pair.u = -u_v_pair.u
+        data['inner1_dx'] = u_v_pair.x
+        data['inner1_dy'] = u_v_pair.y
         self.print_pad_parameters(data)
-        return data
+        self.configured['pad'] = data
     # end def build_pad_data()
 
     def generate_svg_pads(self) -> None:
         '''create and output a complete svg file based on the instance parameters'''
-        self.print_base_arguments() # DEBUG
-        self.configure_for_direction()
-        drawing_data = self.build_drawing_data()
-        pad_data = self.build_pad_data()
         template = self.jinja_env.get_template('tht_separate_hole_pad.svg')
         output = template.render(
-            pad=pad_data,
-            drawing=drawing_data,
+            pad=self.configured['pad'],
+            drawing=self.configured['drawing'],
             connectors=range(self.command_arguments.row_pins))
         self.command_arguments.svg_file.write(output)
     # end def generate_svg_pads()
+
+    class OrientedUv:
+        '''paired coordinate values adjusted for orientation'''
+        # pylint: disable=invalid-name
+        def __init__(self, outer_instance: MakeStretchedBase, u_value: float, v_value: float):
+            self.is_horizontal = bool(outer_instance.configured['horizontal_factor'])
+            self.u = float2int(u_value)
+            self.v = float2int(v_value)
+
+        @property
+        def x(self) -> float:
+            '''x value for the orientation'''
+            if self.is_horizontal:
+                return self.u
+            return self.v
+
+        @property
+        def y(self) -> float:
+            '''y value for the orientation'''
+            if self.is_horizontal:
+                return self.v
+            return self.u
+    # end «inner» class OrientedUv:
+
+    def create_u_v(self, u_value: float, v_value: float) -> OrientedUv:
+        '''create orientation sensitive coordinate pair'''
+        return  MakeStretched.OrientedUv(self, u_value, v_value)
 # end class MakeStretched
 
 
@@ -259,7 +373,6 @@ class CommandLineParser:
         Can not «easily» use `raise argparse.ArgumentError()` and similar. Can not raise any
         exception and have it automatically caught
         '''
-        # pylint: disable=too-many-branches
         parameters = self.command_arguments
         try:
             if parameters.pad_min <= parameters.hole_diameter:
@@ -300,10 +413,6 @@ class CommandLineParser:
             if parameters.pad_max == parameters.pad_min:
                 raise NotImplementedError(
                     'current version of the code does not support creating only circular pads')
-            if parameters.pad_position not in (PAD_POS_HORIZONTAL, PAD_POS_BOTTOM, PAD_POS_TOP):
-                raise NotImplementedError('vertical pad positioning options not implemented yet')
-            if parameters.hole_padding > 0:
-                raise NotImplementedError('hold padding offset not implemented yet')
         except ValueError as exception:
             sys.exit(exception)
         if self.exception_detected:
