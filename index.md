@@ -33,7 +33,7 @@ From there `./stretched_pads.py -h` (on linux) will get the basic help informati
 
 ## <a name="link_examples">⚓</a> Examples
 
-Starting from [this parameter file](examples/base_parameters), the following 6 svg files were generated, using only overrides to the position and padding. Because of the debug option used, these are scaled to 100 times the size they would need to be for use as a PCB view of a fritzing part, then scaled back down to about 10 times (depending on the screen and browser concept of pixels per inch) for viewing here. If you right click, view image, you will get the full 100 times size image, and the browser controls can be used to zoom in, out, and pan.
+Starting from [this parameter file](examples/base_parameters.txt), the following 6 svg files were generated, using only overrides to the position and padding. Because of the debug option used, these are scaled to 100 times the size they would need to be for use as a PCB view of a fritzing part, then scaled back down to about 10 times (depending on the screen and browser concept of pixels per inch) for viewing here. If you right click, view image, you will get the full 100 times size image, and the browser controls can be used to zoom in, out, and pan.
 
 <img src="examples/horizontal-centred.svg"
  alt="image of horizontally aligned connectors with stretched and centred pads"
