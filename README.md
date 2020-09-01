@@ -7,12 +7,14 @@ This is «started as» a small script to generate Fritzing pcb view svg graphics
 
 This was (is being) developed using python 3.7.8 with the Jinja2 v2.11.2 templating engine package. Pylint v2.5.3 is used to keep the python code up to standards and conventions. Earlier versions (especially python) may or may not work. I have no interest in that sort of regression testing for this application. It has no reason to stay backward compatible at that level.
 
+* [github.io view](https://mmerlin.github.io/fritzing_pad_stretch/)
+* [man page](man.md)
 * [The Math](#link_math)
 * [Ideas](#link_ideas)
 * [Planning](#link_planning)
 * [References](#link_references)
 
-This is up to a useable state now. It can generate horizontal or vertical rows of connectors, using several different constraint parameters. The only thing from the options explicitly disabled, is generating circular pads. That is supposed to be possible by setting the pad minimum and maximum to the same value, but the code to filter out the no longer needed path element has not been written. So it is set to throw an error if that condition is seen. Here is the built in help, to get an idea of what can be controlled. Everything except the output svg file name is optional. There are defaults, though not necessarily `reasonable` for everything else. The generated svg includes silkscreen, copper1, copper0 layer ids. If you have a favorite set of default parameters, put them in a text file, then provided that to the application, followed by any overrides for the current run. The last copy of a parameters on the command line will be the one actually used.
+This is up to a useable state now. It can generate horizontal or vertical rows of connectors, using several different constraint parameters. The only thing from the options explicitly disabled, is generating circular pads. That is supposed to be possible by setting the pad minimum and maximum to the same value, but the code and template to filter out the no longer needed path element has not been written. So it is set to throw an error if that condition is seen. Here is the built in help, to get an idea of what can be controlled. Everything except the output svg file name is optional. There are defaults, though not necessarily `reasonable` for everything else. The generated svg includes silkscreen, copper1, copper0 layer ids. If you have a favorite set of default parameters, put them in a text file, then provided that to the application, followed by any overrides for the current run. The last copy of a parameters on the command line will be the one actually used.
 
 ```txt
 ./stretched_pads.py -h

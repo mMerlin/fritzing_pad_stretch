@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="1.2"
+  baseProfile="tiny"
+  height="12in"
+  width="36in"
+  viewBox="0 0 360 120"
+>
+  <g id="silkscreen">
+  </g>
+  <g
+    id='copper1'
+    fill="#f7bd13"
+    stroke="#f7bd13"
+    stroke-width="10"
+    transform="translate(30,80)"
+  >
+    <g id='copper0'>
+      <g
+        id="tht_circles"
+        fill="none"
+      >
+        <circle id="connector0pad" r="25" cy="0" cx="0"/>
+        <circle id="connector1pad" r="25" cy="0" cx="100"/>
+        <circle id="connector2pad" r="25" cy="0" cx="200"/>
+        <circle id="connector3pad" r="25" cy="0" cx="300"/>
+      </g>
+      <g
+        id="extended_pads"
+        stroke="none"
+        transform="translate(-30,-50)"
+      >
+        <path
+          d="m0,0
+            a 30,30 0 0 1 60,0v60
+            a 30,30 0 0 1 -60,0z
+            m 10,50
+            a 20,20 0 0 0 40,0
+            a 20,20 0 0 0 -40,0
+            z"
+        />
+        <path
+          d="m100,0
+            a 30,30 0 0 1 60,0v60
+            a 30,30 0 0 1 -60,0z
+            m 10,50
+            a 20,20 0 0 0 40,0
+            a 20,20 0 0 0 -40,0
+            z"
+        />
+        <path
+          d="m200,0
+            a 30,30 0 0 1 60,0v60
+            a 30,30 0 0 1 -60,0z
+            m 10,50
+            a 20,20 0 0 0 40,0
+            a 20,20 0 0 0 -40,0
+            z"
+        />
+        <path
+          d="m300,0
+            a 30,30 0 0 1 60,0v60
+            a 30,30 0 0 1 -60,0z
+            m 10,50
+            a 20,20 0 0 0 40,0
+            a 20,20 0 0 0 -40,0
+            z"
+        />
+      </g>
+    </g>
+  </g>
+</svg>

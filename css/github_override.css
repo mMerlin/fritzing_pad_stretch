@@ -1,0 +1,18 @@
+/* An override for formatting provided automatically by github.io */
+/* Use Alternate to box model, so specified sized includes border and padding */
+* {
+  box-sizing: border-box;
+}
+
+.markdown-body h1 {
+  margin-top: 0px;
+}
+
+.markdown-body > h1:first-child {
+  display: none;
+}
+
+.anchor {
+  padding: 0 1em 0 2em;
+  background-color: grey;
+}
