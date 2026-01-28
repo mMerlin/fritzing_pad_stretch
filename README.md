@@ -5,7 +5,7 @@
 
 This is «started as» a small script to generate Fritzing pcb view svg graphics for elongated through-hole pcb pads, based on a few numeric parameter constraints. These pads are generated in 2 parts. A circle, and a path. The circle element defines the hole size and postition to be drilled, and the path is the copper pad around the hole.
 
-This was (is being) developed using python 3.7.8 with the Jinja2 v2.11.2 templating engine package. Pylint v2.5.3 is used to keep the python code up to standards and conventions. Earlier versions (especially python) may or may not work. I have no interest in that sort of regression testing for this application. It has no reason to stay backward compatible at that level.
+This was was developed using python 3.7.8 with the Jinja2 v2.11.2 templating engine package. Pylint v2.5.3 is used to keep the python code up to standards and conventions. Earlier versions (especially python) may or may not work. I have no interest in that sort of regression testing for this application. It has no reason to stay backward compatible at that level. The package versions have been updated since then.
 
 * [github.io view](https://mmerlin.github.io/fritzing_pad_stretch/)
 * [man page](man.md)
